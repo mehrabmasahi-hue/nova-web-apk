@@ -16,7 +16,8 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
         with:
-          accept-licenses: 'true'
+          accept-android-sdk-licenses: 'true'
+          log-accepted-android-sdk-licenses: 'false'
       - uses: gradle/actions/setup-gradle@v3
       - run: gradle assembleDebug
       - uses: actions/upload-artifact@v4
