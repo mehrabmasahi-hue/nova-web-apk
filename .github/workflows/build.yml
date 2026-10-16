@@ -10,16 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+
+      - name: Cache Android SDK
+        uses: actions/cache@v4
         with:
-          accept-android-sdk-licenses: 'true'
-          log-accepted-android-sdk-licenses: 'false'
+          path: /usr/local/lib/android/sdk
+          key: android-sdk-v1
+
+      - name: Accept Android licenses
+        run: yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
       - uses: gradle/actions/setup-gradle@v3
-      - run: gradle assembleDebug
+
+      - name: Build
+        run: gradle assembleDebug
+
       - uses: actions/upload-artifact@v4
         with:
           name: nova-web-apk
