@@ -25,12 +25,20 @@ jobs:
       - name: Accept Android licenses
         run: yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
+
       - uses: gradle/actions/setup-gradle@v3
 
-      - name: Build
-        run: gradle assembleDebug
+      - name: Build release APK
+        run: |
+          gradle assembleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/keystore.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: nova-web-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: nova-release-apk
+          path: app/build/outputs/apk/release/*.apk
